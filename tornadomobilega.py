@@ -11,6 +11,7 @@ from urllib import unquote, quote, urlencode
 import uuid
 from tornado.web import RequestHandler
 from tornado.httpclient import HTTPRequest
+from datetime import datetime
 
 try:
     # The mod_python version is more efficient, so try importing it first.
@@ -167,7 +168,7 @@ def track_page_view(handler):
     # // Try and get visitor cookie from the request.
     cookie = RequestHandler.get_cookie(handler, COOKIE_NAME)
 
-    visitor_id = get_visitor_id(handler.request.headers.get("DCMGUID", ''), account, user_agent, cookie)
+    visitor_id = get_visitor_id(handler.request.headers.get("X-DCMGUID", ''), account, user_agent, cookie)
 
     # // Always try and add the cookie to the response.
     # cookie = SimpleCookie()
@@ -175,6 +176,8 @@ def track_page_view(handler):
     # morsel = cookie[COOKIE_NAME]
     # morsel['expires'] = time.strftime('%a, %d-%b-%Y %H:%M:%S %Z', time_tup)
     # morsel['path'] = COOKIE_PATH
+    expires = datetime(*time_tup[0:6])
+    RequestHandler.set_cookie(handler, COOKIE_NAME, visitor_id, expires=expires)
 
     utm_gif_location = "http://www.google-analytics.com/__utm.gif"
     i = handler.request.headers.get("X-Real-Ip", None)
@@ -192,9 +195,9 @@ def track_page_view(handler):
                 "&utme=" + handler.request.arguments.get('utme', [''])[0] +
                 "&utmr=" + quote(document_referer) +
                 "&utmp=" + quote(document_path) +
-                "&utmac=" + utmac + \
+                "&utmac=" + utmac +
                 "&utmcc=__utma%3D999.999.999.999.999.1%3B" +
-                "&utmvid=" + visitor_id + \
+                "&utmvid=" + visitor_id +
                 "&utmip=" + get_ip(i)
         )
         # dbgMsg("utm_url: " + utm_url)
