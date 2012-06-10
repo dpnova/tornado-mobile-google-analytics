@@ -179,9 +179,10 @@ def track_page_view(handler):
     RequestHandler.set_cookie(handler, COOKIE_NAME, visitor_id, expires=expires)
 
     utm_gif_location = "http://www.google-analytics.com/__utm.gif"
-    i = handler.request.headers.get("X-Real-Ip", None)
+    i = handler.request.headers.get("X-Forwarded-For", handler.request.headers.get("X-Real-Ip", None))
     if not i:
         i = handler.request.remote_ip
+    i = i.split(",")[0]
     for utmac in [account, x_utmac]:
         if not utmac:
             continue
