@@ -124,7 +124,8 @@ def send_request_to_google_analytics(utm_url, handler):
                method="GET",
                headers=headers
                )
-    from tweete.utils.async import http
+    from tornado import httpclient
+    http = httpclient.AsyncHTTPClient()
     http.fetch(request, callback=lambda x: x)
     return request
 
