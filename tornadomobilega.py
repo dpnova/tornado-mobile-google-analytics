@@ -119,8 +119,8 @@ def send_request_to_google_analytics(utm_url, handler):
   // communicating with Google Analytics are thown.
     """
     headers = {
-        'User-Agent': handler.request.headers.get('HTTP_USER_AGENT', 'Unknown'),
-        'Accepts-Language:': handler.request.headers.get("HTTP_ACCEPT_LANGUAGE", '')
+        'User-Agent': handler.request.headers.get('User-Agent', 'Unknown'),
+        'Accept-Language:': handler.request.headers.get("Accept-Language", '')
     }
     request = HTTPRequest(url=utm_url,
                method="GET",
@@ -232,13 +232,7 @@ def get_ga_img_src(handler, gif_handler_path):
     vars['utmac'] = handler.google_analytics_code
     vars['utmhn'] = handler.request.host
     vars['utmn'] = random.randint(1000000000, 9999999999)
-
-    ref = handler.request.headers.get('Referer', False)
-    if ref:
-        vars['utmr'] = ref
-    else:
-        vars['utmr'] = "-"
-
+    vars['utmr'] = handler.request.headers.get('Referer', "-")
     vars['utmp'] = handler.request.uri
     vars['guid'] = "ON"
     return gif_handler_path + "?" + urlencode(vars)
