@@ -1,11 +1,10 @@
 """
-Python implementation of ga.php.
+Python implementation of ga.php for tornado.
 """
 import re
 from hashlib import md5
 from random import randint
 import struct
-# import httplib2
 import time
 from urllib import unquote, quote, urlencode
 import uuid
@@ -52,7 +51,6 @@ GIF_DATA = reduce(lambda x, y: x + struct.pack('B', y),
 
 
 def get_ip(remote_address):
-    # dbgMsg("remote_address: " + str(remote_address))
     if not remote_address:
         return ""
     matches = re.match('^([^.]+\.[^.]+\.[^.]+\.).*', remote_address)
@@ -206,13 +204,14 @@ def track_page_view(handler):
     # // If the debug parameter is on, add a header to the response that contains
     # // the url that was used to contact Google Analytics.
     # headers = [('Set-Cookie', str(cookie).split(': ')[1])]
-    # if environ['GET'].get('utmdebug', False):
-    #     headers.append(('X-GA-MOBILE-URL', utm_url))
+    headers = []
+    if handler.request.arguments.get('utmdebug', False):
+        headers.append(('X-GA-MOBILE-URL', utm_url))
 
     # Finally write the gif data to the response
     response = write_gif_data()
-    # response_headers = response['response_headers']
-    # response_headers.extend(headers)
+    response_headers = response['response_headers']
+    response_headers.extend(headers)
     return response
 
 import random
