@@ -120,6 +120,9 @@ def send_request_to_google_analytics(utm_url, handler):
         'User-Agent': handler.request.headers.get('User-Agent', 'Unknown'),
         'Accept-Language:': handler.request.headers.get("Accept-Language", '')
     }
+    opera_ua = handler.request.headers.get("X-Operamini-Phone-Ua")
+    if opera_ua:
+        headers['User-Agent'] = opera_ua[0]
     request = HTTPRequest(url=utm_url,
                method="GET",
                headers=headers
