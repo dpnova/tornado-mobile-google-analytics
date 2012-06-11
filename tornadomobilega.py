@@ -167,7 +167,15 @@ def track_page_view(handler):
     # // Try and get visitor cookie from the request.
     cookie = RequestHandler.get_cookie(handler, COOKIE_NAME)
 
-    visitor_id = get_visitor_id(handler.request.headers.get("X-DCMGUID", ''), account, user_agent, cookie)
+    guidheader = handler.request.headers.get("X-DCMGUID", '')
+    if not guidheader:
+        guidheader = handler.request.headers.get("X-UP-SUBNO", '')
+    if not guidheader:
+        guidheader = handler.request.headers.get("X-JPHONE-UID", '')
+    if not guidheader:
+        guidheader = handler.request.headers.get("X-EM-UID", '')
+
+    visitor_id = get_visitor_id(guidheader, account, user_agent, cookie)
 
     # // Always try and add the cookie to the response.
     # cookie = SimpleCookie()
@@ -198,7 +206,9 @@ def track_page_view(handler):
                 "&utmac=" + utmac +
                 "&utmcc=__utma%3D999.999.999.999.999.1%3B" +
                 "&utmvid=" + visitor_id +
-                "&utmip=" + get_ip(i)
+                "&utmip=" + get_ip(i) +
+                "&utmul=" + handler.request.headers.get("Accept-Language", '-') +
+                "&utmcs=" + handler.request.headers.get("Accept-Charset", '-')
         )
         # dbgMsg("utm_url: " + utm_url)
         send_request_to_google_analytics(utm_url, handler)
