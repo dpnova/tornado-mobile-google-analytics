@@ -122,7 +122,7 @@ def send_request_to_google_analytics(utm_url, handler):
     }
     opera_ua = handler.request.headers.get("X-Operamini-Phone-Ua")
     if opera_ua:
-        headers['User-Agent'] = opera_ua[0]
+        headers['User-Agent'] = opera_ua
     request = HTTPRequest(url=utm_url,
                method="GET",
                headers=headers
